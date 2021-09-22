@@ -11,7 +11,7 @@ Github action for deployment on managed instance.
 
 ```yml
 on: push
-name: Deploy code to a server
+name: Deploying WordPress Site
 jobs:
   deploy:
     name: Deploy
@@ -22,6 +22,12 @@ jobs:
       uses: rtCamp/action-deploy-on-managed-instance@main
       env:
         PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        NPM_VERSION: 7.20.5
+        NODE_VERSION: 14.17.6
+        BUILD_DIRECTORY: buildDirectory/
+        BUILD_COMMAND: echo "buildCommand"
+        BUILD_SCRIPT: path/to/custom/script.sh
+        DEPLOY_LOCATIONS: ./folder/location/to/be/synced/to/remote/server /absolute/path
 ```
 
 3. Create `SSH_PRIVATE_KEY` secret using [GitHub Action's Secret](https://developer.github.com/actions/creating-workflows/storing-secrets) and store the private key that you use use to ssh to server(s) defined in `hosts.yml`.
