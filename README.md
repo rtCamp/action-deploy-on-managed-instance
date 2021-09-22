@@ -11,7 +11,7 @@ Github action for deployment on managed instance.
 
 ```yml
 on: push
-name: Deploying WordPress Site
+name: Deploy code to a server
 jobs:
   deploy:
     name: Deploy
