@@ -1,0 +1,9 @@
+name: 'Action Deploy'
+description: 'Deploy code to a server'
+author: 'Jay Shamnani <jay.shamnani@rtcamp.com>'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+branding:
+  icon: 'upload-cloud'
+  color: 'red'
