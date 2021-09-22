@@ -2,6 +2,44 @@
 
 Github action for deployment on managed instance.
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+
+## Usage
+
+1. Create a `.github/workflows/deploy.yml` file in your GitHub repo, if one doesn't exist already.
+2. Add the following code to the `deploy.yml` file.
+
+```yml
+on: push
+name: Deploying WordPress Site
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Deploy
+      uses: rtCamp/action-deploy-on-managed-instance@main
+      env:
+        PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+```
+
+3. Create `SSH_PRIVATE_KEY` secret using [GitHub Action's Secret](https://developer.github.com/actions/creating-workflows/storing-secrets) and store the private key that you use use to ssh to server(s) defined in `hosts.yml`.
+4. Create `.github/hosts.yml` inventory file, based on [Deployer inventory file](https://deployer.org/docs/hosts.html#inventory-file) format. Make sure you explictly define GitHub branch mapping. Only the GitHub branches mapped in `hosts.yml` will be deployed, rest will be filtered out. Here is a sample [hosts.yml](https://github.com/rtCamp/wordpress-skeleton/blob/main/.github/hosts.yml).
+
+## Environment Variables
+
+This GitHub action's behavior can be customized using following environment variables:
+
+Variable          | Default | Possible  Values            | Purpose
+------------------|---------|-----------------------------|----------------------------------------------------
+`NPM_VERSION`  | null    | 14.17.0       | NPM Version. If not specified, latest version will be used.
+`NODE_VERSION`  | null    | 16.6.0       | Node Version. If not specified, latest version will be used.
+`BUILD_DIRECTORY`  | null    | buildDirectory/       | Build directory. Generally root directory or directory like frontend
+`BUILD_COMMAND`  | null    | npm run build       | Command used to compile the package and/or files etc.
+`BUILD_SCRIPT`  | null    | `runTests.sh`       | Custom or predefined script to run after compilation.
+`DEPLOY_LOCATIONS`  | null    | ./folder/location/to/be/synced/to/remote/server /absolute/path       | space separated path (folder of to be synced) (absolute path to host)
+
 ## Maintainer
 
 ### rtCamp Maintainers:
