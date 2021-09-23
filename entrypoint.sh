@@ -119,6 +119,8 @@ EOL
 
 ssh-keyscan "$hostname" >> ${SSH_DIR}/known_hosts
 
+DEPLOY_LOCATIONS=$GITHUB_WORKSPACE/.github/locations.csv
+
 # Splitting Space separated String
 echo "$DEPLOY_LOCATIONS this is deploy location"
 for line in $DEPLOY_LOCATIONS; do
