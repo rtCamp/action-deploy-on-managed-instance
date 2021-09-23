@@ -121,14 +121,12 @@ ssh-keyscan "$hostname" >> ${SSH_DIR}/known_hosts
 
 # Splitting Space separated String
 
-IFS=' '
 for line in $DEPLOY_LOCATIONS; do
 
     source=$(echo $line | awk -F'[/,]' '{print $1}')
     destination=$(echo $line | awk -F'[/,]' '{print $2}')
+    echo $source
+    echo $destination
     rsync -avzhp -e "ssh -i $HOME/.ssh/id_rsa" $source $ssh_user@$hostname:$destination
 
 done
-# Array of path
-# echo ${DEPLOYPATH[0]}
-# echo ${DEPLOYPATH[1]}
