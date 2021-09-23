@@ -120,7 +120,7 @@ EOL
 ssh-keyscan "$hostname" >> ${SSH_DIR}/known_hosts
 
 # Splitting Space separated String
-
+echo "$DEPLOY_LOCATIONS this is deploy location"
 for line in $DEPLOY_LOCATIONS; do
 
     source=$(echo $line | awk -F'[/,]' '{print $1}')
