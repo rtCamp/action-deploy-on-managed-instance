@@ -123,7 +123,9 @@ DEPLOY_LOCATIONS=$GITHUB_WORKSPACE/.github/locations.csv
 
 # Splitting Space separated String
 echo "$DEPLOY_LOCATIONS this is deploy location"
-for line in $DEPLOY_LOCATIONS; do
+
+while read line;
+do
 
     source=$(echo $line | awk -F'[/,]' '{print $1}')
     destination=$(echo $line | awk -F'[/,]' '{print $2}')
@@ -131,4 +133,4 @@ for line in $DEPLOY_LOCATIONS; do
     echo $destination
     rsync -avzhp -e "ssh -i $HOME/.ssh/id_rsa" $source $ssh_user@$hostname:$destination
 
-done
+done <<< "$(cat $DEPLOY_LOCATIONS)"
