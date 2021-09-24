@@ -27,7 +27,7 @@ jobs:
         BUILD_DIRECTORY: buildDirectory/
         BUILD_COMMAND: echo "buildCommand"
         BUILD_SCRIPT: path/to/custom/script.sh
-        DEPLOY_LOCATIONS: ./folder/location/to/be/synced/to/remote/server /absolute/path
+        DEPLOY_LOCATIONS: ./locations.csv
 ```
 
 3. Create `SSH_PRIVATE_KEY` secret using [GitHub Action's Secret](https://developer.github.com/actions/creating-workflows/storing-secrets) and store the private key that you use use to ssh to server(s) defined in `hosts.yml`.
@@ -44,7 +44,9 @@ Variable          | Default | Possible  Values            | Purpose
 `BUILD_DIRECTORY`  | null    | buildDirectory/       | Build directory. Generally root directory or directory like frontend
 `BUILD_COMMAND`  | null    | npm run build       | Command used to compile the package and/or files etc.
 `BUILD_SCRIPT`  | null    | `runTests.sh`       | Custom or predefined script to run after compilation.
-`DEPLOY_LOCATIONS`  | null    | ./folder/location/to/be/synced/to/remote/server /absolute/path       | space separated path (folder of to be synced) (absolute path to host)
+`DEPLOY_LOCATIONS`  | null    | ./locations.csv       | csv file for locations needs to deployed on host.
+
+##### NOTE (For locations.csv): if trailing slash is not specified, then folder along with all files will be deployed. if trailing slash is appended to it content of the folder will be deployed.
 
 ## Maintainer
 
