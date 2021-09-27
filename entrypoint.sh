@@ -100,20 +100,62 @@ export single_deploy_location=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BR
 #================================================================#
 
 
-mkdir $HOME/.ssh
-chmod 600 ~/.ssh
-SSH_DIR="$HOME/.ssh"
+function setup_private_key() {
 
-echo "$PRIVATE_KEY" | tr -d '\r' > "$SSH_DIR/id_rsa"
-chmod 600 "$SSH_DIR/id_rsa"
-eval "$(ssh-agent -s)"
-ssh-add "$SSH_DIR/id_rsa"
+	if [[ -n "$SSH_PRIVATE_KEY" ]]; then
+	echo "$SSH_PRIVATE_KEY" | tr -d '\r' > "$SSH_DIR/id_rsa"
+	chmod 600 "$SSH_DIR/id_rsa"
+	eval "$(ssh-agent -s)"
+	ssh-add "$SSH_DIR/id_rsa"
 
-cat > /etc/ssh/ssh_config <<EOL
-Host *
+	if [[ -n "$JUMPHOST_SERVER" ]]; then
+		ssh-keyscan -H "$JUMPHOST_SERVER" >> /etc/ssh/known_hosts 
+	fi
+	else
+		# Generate a key-pair
+		ssh-keygen -t rsa -b 4096 -C "GH-actions-ssh-deploy-key" -f "$HOME/.ssh/id_rsa" -N ""
+	fi
+}
+
+function configure_ssh_config() {
+
+if [[ -z "$JUMPHOST_SERVER" ]]; then
+	# Create ssh config file. `~/.ssh/config` does not work.
+	cat > /etc/ssh/ssh_config <<EOL
+Host $hostname
+HostName $hostname
+IdentityFile ${SSH_DIR}/signed-cert.pub
+IdentityFile ${SSH_DIR}/id_rsa
 User $ssh_user
-UserKnownHostsFile ${SSH_DIR}/known_hosts
 EOL
+else
+	# Create ssh config file. `~/.ssh/config` does not work.
+	cat > /etc/ssh/ssh_config <<EOL
+Host jumphost
+	HostName $JUMPHOST_SERVER
+	UserKnownHostsFile /etc/ssh/known_hosts
+	User $ssh_user
+Host $hostname
+	HostName $hostname
+	ProxyJump jumphost
+	UserKnownHostsFile /etc/ssh/known_hosts
+	User $ssh_user
+EOL
+fi
+}
+
+function setup_ssh_access() {
+
+	printf "[\e[0;34mNOTICE\e[0m] Setting up SSH access to server.\n"
+
+	SSH_DIR="$HOME/.ssh"
+	mkdir -p "$SSH_DIR"
+	chmod 700 "$SSH_DIR"
+
+	setup_private_key
+	configure_ssh_config
+}
+setup_ssh_access
 
 ssh-keyscan "$hostname" >> ${SSH_DIR}/known_hosts
 
@@ -162,9 +204,7 @@ then
 
         source=$(echo $line | awk -F'[,]' '{print $1}')
         destination=$(echo $line | awk -F'[,]' '{print $2}')
-        echo $source
-        echo $destination
-        rsync -avzhP -e "ssh -i $HOME/.ssh/id_rsa" \
+        rsync -avzhP -e "ssh -o StrictHostKeyChecking=no" \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'deploy.php' \
@@ -186,7 +226,7 @@ then
 
     done <<< "$(cat $DEPLOY_LOCATIONS)"
 else
-    rsync -avzhP -e "ssh -i $HOME/.ssh/id_rsa" \
+    rsync -avzhP -e "ssh -o StrictHostKeyChecking=no" \
         --exclude '.git' \
         --exclude '.github' \
         --exclude 'deploy.php' \
@@ -204,5 +244,5 @@ else
         --exclude 'package.json' \
         --exclude 'phpcs.xml' \
         --delete \
-        $source $ssh_user@$hostname:$single_deploy_location/
+        $GITHUB_WORKSPACE/ $ssh_user@$hostname:$single_deploy_location/
 fi
