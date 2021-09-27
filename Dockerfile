@@ -8,8 +8,19 @@ RUN apt update && \
 		nodejs \
 		ssh \
 		rsync \
-        python3-pip && \
-        pip3 install shyaml
+		git \
+		python3-pip \
+		software-properties-common && \
+		add-apt-repository ppa:ondrej/php && \
+		apt update && \
+		apt-get install -y php7.4-cli php7.4-curl php7.4-json php7.4-mbstring php7.4-xml php7.4-iconv && \
+		pip3 install shyaml && \
+		rm -rf /var/lib/apt/lists/*
+
+# setup composer
+RUN mkdir -p /composer && \
+	curl -sS https://getcomposer.org/installer | \
+	php -- --install-dir=/usr/bin/ --filename=composer
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +rx entrypoint.sh
