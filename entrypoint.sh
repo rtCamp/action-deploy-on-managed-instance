@@ -5,95 +5,124 @@
 #================================================================#
 
 # Installing NVM
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+function export_nvm() {
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+}
+
+export_nvm
 
 # Installing NPM Latest Version
 
-if [ -z "$NPM_VERSION" ]
-then
+function install_npm_packages() {
 
-    NPM_VERSION="latest"
-    export npm_install=$NPM_VERSION
-    curl -L https://www.npmjs.com/install.sh | sh > /dev/null 2>&1
+    if [ -z "$NPM_VERSION" ]
+    then
 
-else
+        NPM_VERSION="latest"
+        export npm_install=$NPM_VERSION
+        curl -L https://www.npmjs.com/install.sh | sh > /dev/null 2>&1
 
-    export npm_install=$NPM_VERSION
-    curl -L https://www.npmjs.com/install.sh | sh > /dev/null 2>&1
+    else
 
-fi
-    
+        export npm_install=$NPM_VERSION
+        curl -L https://www.npmjs.com/install.sh | sh > /dev/null 2>&1
+
+    fi
+        
+}
+
+install_npm_packages
+
 # Installing Specified version of Node.js
-if [ -z "$NODE_VERSION" ]
-then
 
-    NODE_VERSION=latest
-    nvm install node
+function install_specific_node_version() {
 
-else
+    if [ -z "$NODE_VERSION" ]
+    then
 
-    # Installing Specified version of Node.js
-    echo "Installing Specified version of Node.js"
-    nvm install $NODE_VERSION
+        NODE_VERSION=latest
+        nvm install node
 
-    # Switching to specified version of Node.js
-    echo "Switching to specified version of Node.js"
-    nvm use $NODE_VERSION
+    else
 
-fi
+        # Installing Specified version of Node.js
+        echo "Installing Specified version of Node.js"
+        nvm install $NODE_VERSION
+
+        # Switching to specified version of Node.js
+        echo "Switching to specified version of Node.js"
+        nvm use $NODE_VERSION
+
+    fi
+
+}
+
+install_specific_node_version
 
 #================================================================#
 #                    Build Dir and command                       #
 #================================================================#
 
+function build_directory_build_command_build_script() {
 
-if [ -z "$BUILD_DIRECTORY" ]
-then
 
-    echo "BUILD_DIRECTORY environment variable not set"
-
-else
-
-    if [ -z "$BUILD_COMMAND" ]
+    if [ -z "$BUILD_DIRECTORY" ]
     then
 
-        echo "BUILD_COMMAND environment variable not set"
+        echo "BUILD_DIRECTORY environment variable not set"
 
     else
 
-        cd $BUILD_DIRECTORY
-        ls -la
-        $BUILD_COMMAND
+        if [ -z "$BUILD_COMMAND" ]
+        then
+
+            echo "BUILD_COMMAND environment variable not set"
+
+        else
+
+            cd $BUILD_DIRECTORY
+            ls -la
+            $BUILD_COMMAND
+
+        fi
 
     fi
 
-fi
+    if [ -z "$BUILD_SCRIPT" ]
+        then
 
-if [ -z "$BUILD_SCRIPT" ]
-then
+            echo "BUILD_SCRIPT environment variable not set"
 
-    echo "BUILD_SCRIPT environment variable not set"
+        else
 
-else
+            cd $GITHUB_WORKSPACE    
+            chmod +x "$BUILD_SCRIPT"
+            $BUILD_SCRIPT
 
-    cd $GITHUB_WORKSPACE    
-    chmod +x "$BUILD_SCRIPT"
-    $BUILD_SCRIPT
+    fi
 
-fi
+}
+
+build_directory_build_command_build_script
+
 
 #================================================================#
 #                    Getting user name from hosts file           #
 #================================================================#
 
+function read_hosts_yml_file() {
 
-export GITHUB_BRANCH=${GITHUB_REF##*heads/}
-hosts_file="$GITHUB_WORKSPACE/.github/hosts.yml"
-export hostname=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.hostname")
-export ssh_user=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.user")
-export single_deploy_location=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.single_deploy_location")
+    export GITHUB_BRANCH=${GITHUB_REF##*heads/}
+    hosts_file="$GITHUB_WORKSPACE/.github/hosts.yml"
+    export hostname=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.hostname")
+    export ssh_user=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.user")
+    export single_deploy_location=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.single_deploy_location")
+
+}
+
+read_hosts_yml_file
 
 #================================================================#
 #                    Setting up SSH                              #
