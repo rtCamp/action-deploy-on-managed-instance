@@ -275,3 +275,16 @@ else
         --delete \
         $GITHUB_WORKSPACE/ $ssh_user@$hostname:$single_deploy_location/
 fi
+
+function change_ownership_for_imported_files() {
+    echo "Changing file permissions for imported files"
+    export permissions=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.permissions")
+    if [ -z $single_deploy_location ]
+    then
+        ssh $ssh_user@$hostname chown -R $permissions $destination/*
+    else
+        ssh $ssh_user@$hostname chown -R $permissions $single_deploy_location/*
+    fi
+}
+
+change_ownership_for_imported_files
