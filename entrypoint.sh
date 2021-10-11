@@ -217,6 +217,15 @@ fi
 maybe_install_submodules
 
 #================================================================#
+#                    VIP Plugin Install                          #
+#================================================================#
+
+if $VIP
+then
+install_vip_go_plugins
+fi
+
+#================================================================#
 #                    Deployment                                  #
 #================================================================#
 
@@ -296,8 +305,3 @@ function install_vip_go_plugins() {
     git clone https://github.com/Automattic/vip-go-mu-plugins.git
     git submodule update --init --recursive
 }
-
-if $VIP
-then
-install_vip_go_plugins
-fi
