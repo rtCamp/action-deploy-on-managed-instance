@@ -288,3 +288,16 @@ function change_ownership_for_imported_files() {
 }
 
 change_ownership_for_imported_files
+
+
+function install_vip_go_plugins() {
+    cd $GITHUB_WORKSPACE
+    cd mu-plugins
+    git clone https://github.com/Automattic/vip-go-mu-plugins.git
+    git submodule update --init --recursive
+}
+
+if $VIP
+then
+install_vip_go_plugins
+fi
