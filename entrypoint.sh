@@ -220,9 +220,26 @@ maybe_install_submodules
 #                    VIP Plugin Install                          #
 #================================================================#
 
-if $VIP
+function install_vip_go_plugins() {
+    cd $GITHUB_WORKSPACE
+    cd mu-plugins
+    git clone https://github.com/Automattic/vip-go-mu-plugins.git
+    git submodule update --init --recursive
+    mv vip-go-mu-plugins/* $(pwd)/
+    cd $GITHUB_WORKSPACE
+}
+
+if [ -z $VIP ];
 then
-install_vip_go_plugins
+    echo "VIP Parameter not specified"
+    echo "Skipping VIP Plugin installation..."
+else
+
+    if $VIP
+    then
+    install_vip_go_plugins
+    fi
+
 fi
 
 #================================================================#
@@ -242,7 +259,7 @@ then
 
         source=$(echo $line | awk -F'[,]' '{print $1}')
         destination=$(echo $line | awk -F'[,]' '{print $2}')
-        rsync -avzhP -e "ssh -o StrictHostKeyChecking=no" \
+        rsync -avzh -e "ssh -o StrictHostKeyChecking=no" \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'deploy.php' \
@@ -264,7 +281,7 @@ then
 
     done <<< "$(cat $DEPLOY_LOCATIONS)"
 else
-    rsync -avzhP -e "ssh -o StrictHostKeyChecking=no" \
+    rsync -avzh -e "ssh -o StrictHostKeyChecking=no" \
         --exclude '.git' \
         --exclude '.github' \
         --exclude 'deploy.php' \
@@ -298,10 +315,3 @@ function change_ownership_for_imported_files() {
 
 change_ownership_for_imported_files
 
-
-function install_vip_go_plugins() {
-    cd $GITHUB_WORKSPACE
-    cd mu-plugins
-    git clone https://github.com/Automattic/vip-go-mu-plugins.git
-    git submodule update --init --recursive
-}
