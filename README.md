@@ -75,3 +75,4 @@ Variable          | Default | Possible  Values            | Purpose
 ## Repo integrations
 
 - Runs on Docker 😎
+- Now configurable for github modules
