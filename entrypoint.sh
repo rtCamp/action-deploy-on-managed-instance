@@ -7,6 +7,7 @@
 # Installing NVM
 
 function export_nvm() {
+    echo "Installing NVM"
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 }
@@ -17,6 +18,7 @@ export_nvm
 
 function install_npm_packages() {
 
+    echo "Installing NPM..."
     if [ -z "$NPM_VERSION" ]
     then
 
@@ -83,7 +85,6 @@ function build_directory_build_command_build_script() {
         else
 
             cd $BUILD_DIRECTORY
-            ls -la
             $BUILD_COMMAND
 
         fi
