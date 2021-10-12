@@ -25,8 +25,8 @@ RUN mkdir -p /composer && \
 	php -- --install-dir=/usr/bin/ --filename=composer
 
 RUN echo "Downloading NVM"
-
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+ENV NVM_DIR /usr/local/nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash && . $NVM_DIR/nvm.sh
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +rx entrypoint.sh
