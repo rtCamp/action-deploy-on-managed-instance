@@ -24,9 +24,10 @@ RUN mkdir -p /composer && \
 	curl -sS https://getcomposer.org/installer | \
 	php -- --install-dir=/usr/bin/ --filename=composer
 
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+
 RUN echo "Downloading NVM"
-ENV NVM_DIR /usr/local/nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash && . $NVM_DIR/nvm.sh
+RUN curl -o- https://raw.github.com/creationix/nvm/master/install.sh | bash
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +rx entrypoint.sh
