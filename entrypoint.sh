@@ -281,7 +281,6 @@ then
             --exclude 'package-lock.json' \
             --exclude 'package.json' \
             --exclude 'phpcs.xml' \
-            --delete \
             $source $ssh_user@$hostname:$destination/
 
     done <<< "$(cat $DEPLOY_LOCATIONS)"
@@ -303,7 +302,6 @@ else
         --exclude 'package-lock.json' \
         --exclude 'package.json' \
         --exclude 'phpcs.xml' \
-        --delete \
         $GITHUB_WORKSPACE/ $ssh_user@$hostname:$single_deploy_location/
 fi
 
@@ -318,5 +316,4 @@ function change_ownership_for_imported_files() {
     fi
 }
 
-change_ownership_for_imported_files
-
+# change_ownership_for_imported_files
