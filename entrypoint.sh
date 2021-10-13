@@ -284,7 +284,7 @@ then
             --exclude 'package.json' \
             --exclude 'phpcs.xml' \
             --exclude 'uploads' \
-            --delete
+            --delete \
             $source $ssh_user@$hostname:$destination/
         ssh $ssh_user@$hostname chown -R $permissions $destination/*
 
@@ -308,7 +308,7 @@ else
         --exclude 'package.json' \
         --exclude 'phpcs.xml' \
         --exclude 'uploads' \
-        --delete
+        --delete \
         $GITHUB_WORKSPACE/ $ssh_user@$hostname:$single_deploy_location/
         ssh $ssh_user@$hostname chown -R $permissions $single_deploy_location/*
 fi
