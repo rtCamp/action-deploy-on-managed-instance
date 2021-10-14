@@ -229,7 +229,7 @@ maybe_install_submodules
 function install_vip_go_plugins() {
     cd $GITHUB_WORKSPACE
     cd mu-plugins
-    git clone https://github.com/Automattic/vip-go-mu-plugins.git
+    git clone --depth 1 https://github.com/Automattic/vip-go-mu-plugins.git
     git submodule update --init --recursive
     mv vip-go-mu-plugins/* $(pwd)/
     cd $GITHUB_WORKSPACE
