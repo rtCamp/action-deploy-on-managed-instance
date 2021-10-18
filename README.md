@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Deploy
-      uses: rtCamp/action-deploy-on-managed-instance@main
+      uses: docker://ghcr.io/rtcamp/action-deploy-on-managed-instance:latest
       env:
         PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         NPM_VERSION: 7.20.5
