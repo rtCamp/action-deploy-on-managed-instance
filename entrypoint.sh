@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd $GITHUB_WORKSPACE
+
 #================================================================#
 #                    Node and NPM Setup                          #
 #================================================================#
@@ -7,6 +9,9 @@
 # Installing NVM
 
 function export_nvm() {
+    echo "Downloading NVM"
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+    echo "Installing NVM"
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 }
@@ -17,6 +22,7 @@ export_nvm
 
 function install_npm_packages() {
 
+    echo "Installing NPM"
     if [ -z "$NPM_VERSION" ]
     then
 
@@ -83,7 +89,6 @@ function build_directory_build_command_build_script() {
         else
 
             cd $BUILD_DIRECTORY
-            ls -la
             $BUILD_COMMAND
 
         fi
@@ -217,6 +222,32 @@ fi
 maybe_install_submodules
 
 #================================================================#
+#                    VIP Plugin Install                          #
+#================================================================#
+
+function install_vip_go_plugins() {
+    cd $GITHUB_WORKSPACE
+    cd mu-plugins
+    git clone https://github.com/Automattic/vip-go-mu-plugins.git
+    git submodule update --init --recursive
+    mv vip-go-mu-plugins/* $(pwd)/
+    cd $GITHUB_WORKSPACE
+}
+
+if [ -z $VIP ];
+then
+    echo "VIP Parameter not specified"
+    echo "Skipping VIP Plugin installation..."
+else
+
+    if $VIP
+    then
+    install_vip_go_plugins
+    fi
+
+fi
+
+#================================================================#
 #                    Deployment                                  #
 #================================================================#
 
@@ -233,7 +264,7 @@ then
 
         source=$(echo $line | awk -F'[,]' '{print $1}')
         destination=$(echo $line | awk -F'[,]' '{print $2}')
-        rsync -avzhP -e "ssh -o StrictHostKeyChecking=no" \
+        rsync -avzh -e "ssh -o StrictHostKeyChecking=no" \
             --exclude '.git' \
             --exclude '.github' \
             --exclude 'deploy.php' \
@@ -255,7 +286,7 @@ then
 
     done <<< "$(cat $DEPLOY_LOCATIONS)"
 else
-    rsync -avzhP -e "ssh -o StrictHostKeyChecking=no" \
+    rsync -avzh -e "ssh -o StrictHostKeyChecking=no" \
         --exclude '.git' \
         --exclude '.github' \
         --exclude 'deploy.php' \
@@ -288,3 +319,4 @@ function change_ownership_for_imported_files() {
 }
 
 change_ownership_for_imported_files
+
