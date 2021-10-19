@@ -120,7 +120,7 @@ build_directory_build_command_build_script
 function read_hosts_yml_file() {
 
     export GITHUB_BRANCH=${GITHUB_REF##*heads/}
-    hosts_file="$GITHUB_WORKSPACE/.github/hosts.yml"
+    hosts_file="$GITHUB_WORKSPACE/.github/managed-hosts.yml"
     export hostname=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.hostname")
     export ssh_user=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.user")
     export single_deploy_location=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.single_deploy_location")
