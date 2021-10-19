@@ -9,11 +9,11 @@ cd $GITHUB_WORKSPACE
 # Installing NVM
 
 function export_nvm() {
-    echo "Downloading NVM"
+
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-    echo "Installing NVM"
     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
 }
 
 export_nvm
@@ -124,6 +124,7 @@ function read_hosts_yml_file() {
     export hostname=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.hostname")
     export ssh_user=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.user")
     export single_deploy_location=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.single_deploy_location")
+    export permissions=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.permissions")
 
 }
 
@@ -228,7 +229,7 @@ maybe_install_submodules
 function install_vip_go_plugins() {
     cd $GITHUB_WORKSPACE
     cd mu-plugins
-    git clone https://github.com/Automattic/vip-go-mu-plugins.git
+    git clone --depth 1 https://github.com/Automattic/vip-go-mu-plugins.git
     git submodule update --init --recursive
     mv vip-go-mu-plugins/* $(pwd)/
     cd $GITHUB_WORKSPACE
@@ -281,8 +282,10 @@ then
             --exclude 'package-lock.json' \
             --exclude 'package.json' \
             --exclude 'phpcs.xml' \
+            --exclude 'uploads' \
             --delete \
             $source $ssh_user@$hostname:$destination/
+        ssh $ssh_user@$hostname chown -R $permissions $destination/*
 
     done <<< "$(cat $DEPLOY_LOCATIONS)"
 else
@@ -303,20 +306,8 @@ else
         --exclude 'package-lock.json' \
         --exclude 'package.json' \
         --exclude 'phpcs.xml' \
+        --exclude 'uploads' \
         --delete \
         $GITHUB_WORKSPACE/ $ssh_user@$hostname:$single_deploy_location/
-fi
-
-function change_ownership_for_imported_files() {
-    echo "Changing file permissions for imported files"
-    export permissions=$(cat "$hosts_file" | shyaml get-value "$GITHUB_BRANCH.permissions")
-    if [ -z $single_deploy_location ]
-    then
-        ssh $ssh_user@$hostname chown -R $permissions $destination/*
-    else
         ssh $ssh_user@$hostname chown -R $permissions $single_deploy_location/*
-    fi
-}
-
-change_ownership_for_imported_files
-
+fi
