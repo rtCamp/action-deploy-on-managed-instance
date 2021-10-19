@@ -307,7 +307,15 @@ else
         --exclude 'package.json' \
         --exclude 'phpcs.xml' \
         --exclude 'uploads' \
+        --exclude 'SKELETON-GUIDE.md' \
         --delete \
         $GITHUB_WORKSPACE/ $ssh_user@$hostname:$single_deploy_location/
         ssh $ssh_user@$hostname chown -R $permissions $single_deploy_location/*
+
+        if [ $(ls $GITHUB_WORKSPACE/webroot-files/ | wc -l) -gt 0 ]
+        then 
+            ssh $ssh_user@$hostname mv $single_deploy_location/webroot-files/* $single_deploy_location/..
+        else
+            echo "no content in webroot-files skipping moving"
+        fi
 fi
